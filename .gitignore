@@ -1,0 +1,8 @@
+# Ignore all compiled Java class files
+*.class
+
+# Ignore the build output directory
+
+# Ignore temporary scratchpads and update logs
+Documentation/reame-create.txt
+Documentation/update.txt
