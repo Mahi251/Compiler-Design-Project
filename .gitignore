@@ -2,6 +2,7 @@
 *.class
 
 # Ignore the build output directory
+out/
 
 # Ignore temporary scratchpads and update logs
 Documentation/reame-create.txt
