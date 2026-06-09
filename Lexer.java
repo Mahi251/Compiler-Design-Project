@@ -84,7 +84,22 @@ public class Lexer {
                 continue;
             }
 
-            // ----- Operators / Punctuation -----
+            // ----- Comments / Operators / Punctuation -----
+            // Slash is special: it can start a comment or represent division.
+            if (c == '/') {
+                if (pos + 1 < source.length()) {
+                    char next = source.charAt(pos + 1);
+                    if (next == '/') {
+                        skipLineComment();
+                        continue;
+                    }
+                    if (next == '*') {
+                        skipBlockComment();
+                        continue;
+                    }
+                }
+            }
+
             // For multi-character operators (==, !=, <=, >=, &&, ||)
             // we peek at the next char as well.
             tokens.add(readOperatorOrPunctuation());
@@ -206,6 +221,41 @@ public class Lexer {
                 throw new LexerException(
                         "Unrecognised character '" + c + "' at line " + line);
         }
+    }
+
+    /**
+     * Skips a single-line comment that starts with // and ends at the
+     * next newline or end-of-input.
+     */
+    private void skipLineComment() {
+        pos += 2; // consume "//"
+        while (pos < source.length() && source.charAt(pos) != '\n') {
+            pos++;
+        }
+        // Leave the newline for the main loop so it can increment line.
+    }
+
+    /*
+     * Skips a block comment that starts with slash-star and ends with
+     * star-slash. Newlines inside the comment still increment the line
+     * counter.
+     */
+    private void skipBlockComment() {
+        pos += 2; // consume "/*"
+        while (pos < source.length()) {
+            char c = source.charAt(pos);
+            if (c == '\n') {
+                line++;
+                pos++;
+                continue;
+            }
+            if (c == '*' && pos + 1 < source.length() && source.charAt(pos + 1) == '/') {
+                pos += 2;
+                return;
+            }
+            pos++;
+        }
+        throw new LexerException("Unterminated block comment at line " + line);
     }
 
     /**
