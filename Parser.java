@@ -18,6 +18,7 @@
  *   statement      -> declaration
  *                  |  assignment
  *                  |  functionCallStmt
+ *                  |  expressionStmt
  *                  |  returnStmt
  *                  |  ifStmt
  *                  |  whileStmt
@@ -275,9 +276,9 @@ public class Parser {
         if (first.getType() == TokenType.LBRACE) {
             return parseBlock();
         }
-        // Anything else must start with an identifier: it could be
-        // either an assignment or a function call. We disambiguate by
-        // looking further ahead for the '(' or '='.
+        // Anything else must start with an identifier: it could be an
+        // assignment, a function call, or a plain expression statement
+        // such as "x == 11;".
         if (first.getType() == TokenType.IDENTIFIER) {
             return parseAssignmentOrCall();
         }
@@ -337,10 +338,7 @@ public class Parser {
         if (after == TokenType.LPAREN) {
             return parseFunctionCallStatement();
         }
-        throw new SyntaxException(
-                "Syntax Error at line " + peek().getLineNumber()
-                        + ": Expected '=' or '(' after identifier '"
-                        + peek().getLexeme() + "'");
+        return parseExpressionStatement();
     }
 
     /**
@@ -376,6 +374,18 @@ public class Parser {
         node.addChild(args);
         consume(TokenType.RPAREN, "Expected ')' to close function call");
         consume(TokenType.SEMICOLON, "Expected ';' after function call");
+        return node;
+    }
+
+    /**
+     * Parses an expression statement: expression ';'
+     * This allows comparisons like "x == 11;" to be treated as valid
+     * statements, matching C's expression-statement behavior.
+     */
+    private ParseTreeNode parseExpressionStatement() {
+        ParseTreeNode node = new ParseTreeNode("ExpressionStatement");
+        node.addChild(parseExpression());
+        consume(TokenType.SEMICOLON, "Expected ';' after expression");
         return node;
     }
 

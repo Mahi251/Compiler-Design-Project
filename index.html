@@ -169,6 +169,54 @@
             </div>
         </section>
 
+<!-- START OF CAPABILITIES SECTION -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+    
+    <!-- What It Handles Card -->
+    <div class="p-6 rounded-xl border border-emerald-500/20 bg-emerald-950/10 backdrop-blur-sm">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-emerald-400 tracking-wide">Supported Features</h3>
+        </div>
+        <ul class="space-y-3 text-black text-sm">
+            <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <strong>Character Scanning:</strong> Processes code left-to-right sequentially, skipping whitespace and tracking lines accurately.</li>
+            <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <strong>Token Identification:</strong> Recognizes keywords, identifiers, numeric literals, operators, and punctuation.</li>
+            <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <strong>Smart Lexical Hints:</strong> Suggests typo corrections for incomplete tokens like <code class="bg-emerald-900/40 px-1 rounded text-emerald-300">!</code>, <code class="bg-emerald-900/40 px-1 rounded text-emerald-300">&amp;</code>, or <code class="bg-emerald-900/40 px-1 rounded text-emerald-300">|</code>.</li>
+            <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <strong>Recursive Descent Parsing:</strong> Uses top-down structured parsing combined with precedence climbing for math expressions.</li>
+            <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <strong>Grammar Lookahead:</strong> Employs 2-token and 3-token lookahead choices to cleanly parse functions and complex assignments.</li>
+            <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <strong>Visual Parse Tree:</strong> Builds ordered hierarchies mapped dynamically onto a Swing <code class="bg-emerald-900/40 px-1 rounded text-emerald-300">JTree</code> component.</li>
+            <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">✓</span> <strong>Flat Symbol Mapping:</strong> Tracks registered names, data types, and reference positions using a fast global <code class="bg-emerald-900/40 px-1 rounded text-emerald-300">HashMap</code>.</li>
+        </ul>
+    </div>
+
+    <!-- What It Does NOT Handle Card -->
+    <div class="p-6 rounded-xl border border-rose-500/20 bg-rose-950/10 backdrop-blur-sm">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 rounded-lg bg-rose-500/10 text-rose-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-rose-400 tracking-wide">Out of Scope / Limitations</h3>
+        </div>
+        <ul class="space-y-3 text-black text-sm">
+            <li class="flex items-start gap-2"><span class="text-rose-400 font-bold">✕</span> <strong>Nested Scoping:</strong> Lacks scope stacks or local blocks; all variable entries coexist on a single global layout layer.</li>
+            <li class="flex items-start gap-2"><span class="text-rose-400 font-bold">✕</span> <strong>Semantic Analysis:</strong> No automated type verification or parameter compatibility checks for routines or statements.</li>
+            <li class="flex items-start gap-2"><span class="text-rose-400 font-bold">✕</span> <strong>Declaration Protection:</strong> Does not block duplicate definitions or force compile-time validation for missing lookups.</li>
+            <li class="flex items-start gap-2"><span class="text-rose-400 font-bold">✕</span> <strong>Code Generation:</strong> Lacks a target backend; does not produce target assembly language, instructions, or bytecode formats.</li>
+            <li class="flex items-start gap-2"><span class="text-rose-400 font-bold">✕</span> <strong>Error Recovery:</strong> Missing panic-mode synchronization engines; completely halts compilation tasks at the first fault.</li>
+            <li class="flex items-start gap-2"><span class="text-rose-400 font-bold">✕</span> <strong>C-Language Restrictions:</strong> Fails to enforce basic rules against misuse of semantic structural keywords like <code class="bg-rose-900/40 px-1 rounded text-rose-300">void</code>.</li>
+            <li class="flex items-start gap-2"><span class="text-rose-400 font-bold">✕</span> <strong>Comments &amp; Specific Literals:</strong> Lexical specifications completely omit support filters for strings, chars, or inline remarks.</li>
+        </ul>
+    </div>
+
+</div>
+<!-- END OF CAPABILITIES SECTION -->
+ 
         <!-- MODULE: THEORY & CONCEPTS (Theory Manual & Type Distinction integrated) -->
         <section id="mod-theory" class="module hidden">
             <header class="mb-8">
