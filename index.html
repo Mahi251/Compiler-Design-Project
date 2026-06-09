@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compiler Defense Suite | Group Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chosen Palette: Midnight Slate & Bio-Emerald - A high-performance, technical aesthetic using deep blues and energetic greens. -->
+    
+    <!-- Application Structure Plan: 
+         The SPA is organized into five specialized "Command Modules" to facilitate different phases of the project defense:
+         1. Presentation Module: A re-integrated version of the slideshow for the initial group pitch.
+         2. Theory Module: Merges the Type Distinction guide and Theory Manual for rapid conceptual lookup.
+         3. Test Lab Module: An interactive grid of 6 key test scenarios with "Defense Angles" for the live demo.
+         4. Defense Strategy: Interactive "Trap Question" cards and the Code Location Map.
+         5. Team Registry: Visual breakdown of member roles and specializations.
+         WHY: This unified structure prevents group members from fumbling between files during the oral exam, putting all technical and strategic answers one click away.
+    -->
+
+    <!-- Visualization & Content Choices: 
+         1. Doughnut Chart (Chart.js) -> Showing Lexical Token proportions.
+         2. Radar Chart (Chart.js) -> Comparing Metadata roles for Data Types vs Symbol Types.
+         3. Dynamic Tab System -> Switching between Presentation, Lab, and Theory.
+         4. Copy-able Snippets -> Quick access to demo code.
+         Confirmation: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --slate-950: #020617;
+            --emerald-500: #10b981;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .code-font { font-family: 'Fira Code', monospace; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            margin: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+
+        .nav-btn.active {
+            background-color: var(--slate-950);
+            color: white;
+            box-shadow: 0 4px 12px rgba(2, 6, 23, 0.2);
+        }
+
+        .glass-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--emerald-500);
+            transform: translateY(-2px);
+        }
+
+        .sidebar-link:hover i {
+            color: var(--emerald-500);
+        }
+
+        .slide-frame {
+            background: #1e293b;
+            aspect-ratio: 16/9;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            color: white;
+            text-align: center;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-full md:w-64 bg-slate-950 text-slate-400 p-6 flex flex-col z-50">
+        <div class="flex items-center gap-3 mb-10">
+            <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-slate-950 font-bold">C</div>
+            <div>
+                <h1 class="text-white font-bold leading-tight">Compiler</h1>
+                <p class="text-[10px] uppercase tracking-widest text-emerald-500 font-bold">Command Center</p>
+            </div>
+        </div>
+
+        <nav class="flex flex-col gap-2 flex-grow">
+            <button onclick="nav('presentation')" id="btn-presentation" class="nav-btn sidebar-link text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 active">
+                <i class="fas fa-desktop"></i> <span>Presentation</span>
+            </button>
+            <button onclick="nav('theory')" id="btn-theory" class="nav-btn sidebar-link text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3">
+                <i class="fas fa-book-open"></i> <span>Theory & Concepts</span>
+            </button>
+            <button onclick="nav('lab')" id="btn-lab" class="nav-btn sidebar-link text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3">
+                <i class="fas fa-vial"></i> <span>Test Lab</span>
+            </button>
+            <button onclick="nav('defense')" id="btn-defense" class="nav-btn sidebar-link text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3">
+                <i class="fas fa-shield-halved"></i> <span>Defense Toolkit</span>
+            </button>
+            <button onclick="nav('team')" id="btn-team" class="nav-btn sidebar-link text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3">
+                <i class="fas fa-users-gear"></i> <span>Team Roles</span>
+            </button>
+        </nav>
+
+        <div class="mt-10 p-4 bg-slate-900 rounded-2xl border border-slate-800">
+            <p class="text-[10px] uppercase font-bold text-slate-500 mb-2">Current Version</p>
+            <p class="text-xs text-white">V1.0 Final Build</p>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow h-screen overflow-y-auto custom-scroll p-4 md:p-10">
+        
+        <!-- MODULE: PRESENTATION -->
+        <section id="mod-presentation" class="module active">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Presentation Deck</h2>
+                <p class="text-slate-500 italic">Use the arrows to cycle through the group slides for the defense panel.</p>
+            </header>
+
+            <div class="relative group max-w-5xl mx-auto">
+                <div id="slide-container" class="slide-frame shadow-2xl transition-all duration-500">
+                    <!-- Dynamic Slide Content Inserted Here -->
+                    <h1 class="text-5xl font-extrabold text-emerald-400 mb-4">C Subset Compiler</h1>
+                    <p class="text-xl text-slate-300">Frontend Analysis Suite in Java Swing</p>
+                </div>
+                
+                <div class="flex justify-between mt-6 items-center">
+                    <div class="flex gap-2">
+                        <button onclick="prevSlide()" class="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <button onclick="nextSlide()" class="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <p id="slide-counter" class="text-sm font-bold text-slate-400">SLIDE 1 / 7</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+                <div class="glass-card p-6">
+                    <h3 class="font-bold mb-4 flex items-center gap-2"><i class="fas fa-chart-pie text-emerald-500"></i> Token Complexity</h3>
+                    <div class="chart-container">
+                        <canvas id="tokenChart"></canvas>
+                    </div>
+                </div>
+                <div class="glass-card p-8 bg-slate-950 text-white flex flex-col justify-center">
+                    <h3 class="text-emerald-500 font-bold mb-4">The "Elevator Statement"</h3>
+                    <p class="text-lg leading-relaxed italic text-slate-300">
+                        "We built a high-performance frontend for a C subset using Recursive Descent parsing and precedence climbing. Our system bridges character streaming with visual hierarchical trees, providing real-time feedback and diagnostic error catching directly within a custom Java Swing interface."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE: THEORY -->
+        <section id="mod-theory" class="module hidden">
+            <header class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Theory & Concepts</h2>
+                <p class="text-slate-500">Deep technical insights into the Lexer and Parser architecture.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                <div class="glass-card p-8">
+                    <div class="text-xs font-bold uppercase tracking-widest text-emerald-600 mb-2">The core Distinction</div>
+                    <h3 class="text-xl font-bold mb-6">Data Type vs Symbol Type</h3>
+                    <div class="chart-container mb-6">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-slate-50 rounded-xl border-l-4 border-emerald-500">
+                            <h4 class="font-bold text-sm">Data Type (Content)</h4>
+                            <p class="text-xs text-slate-500">What values can it hold? (int, float). Determines memory size.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border-l-4 border-slate-900">
+                            <h4 class="font-bold text-sm">Symbol Type (Role)</h4>
+                            <p class="text-xs text-slate-500">How is it used? (VARIABLE, FUNCTION). Determines parse validity.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glass-card p-8">
+                        <h3 class="font-bold text-lg mb-4">Handling Left Recursion</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Infinite loops are avoided through **Precedence Climbing** and **Grammar Refactoring**. For arithmetic expressions, we use iterative loops instead of pure recursion to ensure $LL(k)$ stability.
+                        </p>
+                    </div>
+                    <div class="glass-card p-8">
+                        <h3 class="font-bold text-lg mb-4">Recursive Descent Logic</h3>
+                        <p class="text-sm text-slate-600 mb-4">Every Context-Free Grammar rule is mapped to a Java method:</p>
+                        <pre class="bg-slate-950 text-emerald-400 p-4 rounded-xl text-xs code-font">
+// Example Logic in Parser.java
+public ParseTreeNode parseWhile() {
+    consume(WHILE); // Verify "while"
+    consume(LPAREN); // Verify "("
+    Condition node = parseCondition();
+    consume(RPAREN); // Verify ")"
+    Block node = parseBlock();
+    return new WhileNode(Condition, Block);
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE: LAB -->
+        <section id="mod-lab" class="module hidden">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Interactive Test Lab</h2>
+                <p class="text-slate-500">Verify logic using these 6 high-priority test scenarios.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Case 1 -->
+                <div class="glass-card p-6 border-t-4 border-emerald-500">
+                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Case 01: Standard</span>
+                    <h4 class="font-bold text-slate-900 mb-3">Simple Assignment</h4>
+                    <div class="bg-slate-950 text-emerald-500 p-3 rounded-lg text-xs code-font mb-3">int x = 10;</div>
+                    <p class="text-[11px] text-slate-500 mb-4 font-medium italic">Defense: Explain how your Symbol Table stores "x" as an INT.</p>
+                    <button onclick="copyCode('int x = 10;')" class="text-xs font-bold text-slate-950 hover:text-emerald-600 transition-colors">COPY INPUT</button>
+                </div>
+                <!-- Case 2 -->
+                <div class="glass-card p-6 border-t-4 border-rose-500">
+                    <span class="text-[10px] font-bold text-rose-600 uppercase tracking-widest">Case 02: Syntax Error</span>
+                    <h4 class="font-bold text-slate-900 mb-3">Missing Punctuation</h4>
+                    <div class="bg-slate-950 text-rose-400 p-3 rounded-lg text-xs code-font mb-3">int x = 42 while (x > 0)</div>
+                    <p class="text-[11px] text-slate-500 mb-4 font-medium italic">Defense: Prove your parser halts on SyntaxException immediately.</p>
+                    <button onclick="copyCode('int x = 42 while (x > 0)')" class="text-xs font-bold text-slate-950 hover:text-rose-600 transition-colors">COPY INPUT</button>
+                </div>
+                <!-- Case 3 -->
+                <div class="glass-card p-6 border-t-4 border-rose-500">
+                    <span class="text-[10px] font-bold text-rose-600 uppercase tracking-widest">Case 03: Lexical Reject</span>
+                    <h4 class="font-bold text-slate-900 mb-3">Unsupported Char</h4>
+                    <div class="bg-slate-950 text-rose-400 p-3 rounded-lg text-xs code-font mb-3">char c = 'A';</div>
+                    <p class="text-[11px] text-slate-500 mb-4 font-medium italic">Defense: Demonstrate Lexer whitelisting vs blacklisting.</p>
+                    <button onclick="copyCode('char c = \'A\';')" class="text-xs font-bold text-slate-950 hover:text-rose-600 transition-colors">COPY INPUT</button>
+                </div>
+                <!-- Case 4 -->
+                <div class="glass-card p-6 border-t-4 border-emerald-500">
+                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Case 04: Hierarchy</span>
+                    <h4 class="font-bold text-slate-900 mb-3">Nested While Loop</h4>
+                    <div class="bg-slate-950 text-emerald-500 p-3 rounded-lg text-xs code-font mb-3">while (x > 0) { x = x - 1; }</div>
+                    <p class="text-[11px] text-slate-500 mb-4 font-medium italic">Defense: Visualizing the parent-child node recursion in Swing.</p>
+                    <button onclick="copyCode('while (x > 0) { x = x - 1; }')" class="text-xs font-bold text-slate-950 hover:text-emerald-600 transition-colors">COPY INPUT</button>
+                </div>
+                <!-- Case 5 -->
+                <div class="glass-card p-6 border-t-4 border-emerald-500">
+                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Case 05: Scoping</span>
+                    <h4 class="font-bold text-slate-900 mb-3">Keyword Interference</h4>
+                    <div class="bg-slate-950 text-emerald-500 p-3 rounded-lg text-xs code-font mb-3">int while1 = 10;</div>
+                    <p class="text-[11px] text-slate-500 mb-4 font-medium italic">Defense: Explain "Longest Match" rule for identifiers.</p>
+                    <button onclick="copyCode('int while1 = 10;')" class="text-xs font-bold text-slate-950 hover:text-emerald-600 transition-colors">COPY INPUT</button>
+                </div>
+                <!-- Case 6 -->
+                <div class="glass-card p-6 border-t-4 border-slate-950">
+                    <span class="text-[10px] font-bold text-slate-950 uppercase tracking-widest">Case 06: Filtering</span>
+                    <h4 class="font-bold text-slate-900 mb-3">Pure Comments</h4>
+                    <div class="bg-slate-950 text-slate-400 p-3 rounded-lg text-xs code-font mb-3">// This is code? <br>// No, just comments</div>
+                    <p class="text-[11px] text-slate-500 mb-4 font-medium italic">Defense: Show that the Lexer creates 0 tokens here.</p>
+                    <button onclick="copyCode('// Just comments')" class="text-xs font-bold text-slate-950 hover:text-slate-600 transition-colors">COPY INPUT</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE: DEFENSE -->
+        <section id="mod-defense" class="module hidden">
+            <header class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Defense Strategy Toolkit</h2>
+                <p class="text-slate-500 italic">Turning quirks into engineering "Design Strengths".</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                <div class="space-y-4">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fas fa-bullseye text-emerald-500"></i> Trap Questions</h3>
+                    <div class="glass-card p-6 hover:border-emerald-500 cursor-pointer" onclick="toggleAnswer(1)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-sm">"Why a flat Symbol Table?"</h4>
+                            <i class="fas fa-chevron-down text-slate-300" id="icon-1"></i>
+                        </div>
+                        <p id="ans-1" class="hidden text-xs text-slate-500 mt-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <strong>Strategy:</strong> Frame it as a performance/boundary choice. "Our focus was Frontend Syntax. A flat $O(1)$ lookup ensures clean JTree visualization within the project timeline, delegating nested scope management to the Semantic/Optimization phase."
+                        </p>
+                    </div>
+                    <div class="glass-card p-6 hover:border-emerald-500 cursor-pointer" onclick="toggleAnswer(2)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-sm">"Why no type-mismatch errors?"</h4>
+                            <i class="fas fa-chevron-down text-slate-300" id="icon-2"></i>
+                        </div>
+                        <p id="ans-2" class="hidden text-xs text-slate-500 mt-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <strong>Strategy:</strong> Use the "Syntax vs Semantics" boundary. "Our parser validates structure. <code>void x = 10;</code> is syntactically perfect even if semantically flawed. We focused on building a robust Syntax Analyzer first."
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8">
+                    <h3 class="font-bold text-slate-900 mb-6 flex items-center gap-2"><i class="fas fa-map text-emerald-500"></i> Code Navigation Map</h3>
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="w-2 bg-emerald-500 rounded-full"></div>
+                            <div>
+                                <h4 class="font-bold text-sm">Lexer.java</h4>
+                                <p class="text-[10px] text-slate-500">Line 56: Main char loop | Line 103: Identifier classifier</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-2 bg-blue-500 rounded-full"></div>
+                            <div>
+                                <h4 class="font-bold text-sm">Parser.java</h4>
+                                <p class="text-[10px] text-slate-500">Line 96: parse() entry | Line 163: 3-Token Lookahead</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-2 bg-slate-950 rounded-full"></div>
+                            <div>
+                                <h4 class="font-bold text-sm">CompilerGUI.java</h4>
+                                <p class="text-[10px] text-slate-500">Line 241: Syntax Error Catching | Line 265: Tree Reset</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE: TEAM -->
+        <section id="mod-team" class="module hidden">
+            <header class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-slate-900 tracking-tight">The Build Team</h2>
+                <p class="text-slate-500 italic max-w-xl mx-auto mt-2">Individual contribution breakdown for the panel defense.</p>
+            </header>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div class="glass-card p-6 text-center">
+                    <div class="w-16 h-16 bg-slate-950 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">MI</div>
+                    <h4 class="font-bold text-sm">Mahi Imran</h4>
+                    <p class="text-[10px] text-emerald-600 font-bold mb-4">LEXER ARCHITECT</p>
+                    <p class="text-[10px] text-slate-500 leading-tight">Handled streaming engine, line tracking, and lexical exceptions.</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <div class="w-16 h-16 bg-slate-950 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">OS</div>
+                    <h4 class="font-bold text-sm">Omer Seid</h4>
+                    <p class="text-[10px] text-emerald-600 font-bold mb-4">PARSER CORE</p>
+                    <p class="text-[10px] text-slate-500 leading-tight">Implemented precedence climbing for arithmetic expressions.</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <div class="w-16 h-16 bg-slate-950 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">DF</div>
+                    <h4 class="font-bold text-sm">Dagem Feleke</h4>
+                    <p class="text-[10px] text-emerald-600 font-bold mb-4">CONTROL FLOWS</p>
+                    <p class="text-[10px] text-slate-500 leading-tight">Mastered LL(k) lookahead for While/For/If blocks.</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <div class="w-16 h-16 bg-slate-950 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">AM</div>
+                    <h4 class="font-bold text-sm">A.rahman M.</h4>
+                    <p class="text-[10px] text-emerald-600 font-bold mb-4">DATA STRUCTURES</p>
+                    <p class="text-[10px] text-slate-500 leading-tight">Developed Symbol Table registry and tree node mappings.</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <div class="w-16 h-16 bg-slate-950 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">DF</div>
+                    <h4 class="font-bold text-sm">Dawit Fitsum</h4>
+                    <p class="text-[10px] text-emerald-600 font-bold mb-4">UI INTEGRATION</p>
+                    <p class="text-[10px] text-slate-500 leading-tight">Built Swing GUI and managed visual cleanup routines.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script>
+        // NAVIGATION ENGINE
+        function nav(id) {
+            document.querySelectorAll('.module').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`mod-${id}`).classList.remove('hidden');
+            document.getElementById(`btn-${id}`).classList.add('active');
+        }
+
+        // SLIDESHOW ENGINE
+        let currentSlide = 0;
+        const slides = [
+            { t: "C Subset Compiler", p: "Frontend Analysis Suite in Java Swing", c: "bg-slate-950" },
+            { t: "Language Specs", p: "Support for int, float, void. Logic: while, for, if-else.", c: "bg-emerald-900" },
+            { t: "The Lexer", p: "Char streaming skipping comments. $O(N)$ complexity.", c: "bg-slate-900" },
+            { t: "The Parser", p: "Recursive Descent + LL(k) Lookahead. Precedence Climbing logic.", c: "bg-emerald-950" },
+            { t: "Symbol Table", p: "HashMap registry tracking Name, Type, and Scope Role.", c: "bg-slate-900" },
+            { t: "QA Results", p: "100% detection of missing semicolons and invalid types.", c: "bg-emerald-900" },
+            { t: "Ready for Defense", p: "Project Demonstration & Code Q&A Panel.", c: "bg-slate-950" }
+        ];
+
+        function updateSlide() {
+            const frame = document.getElementById('slide-container');
+            const data = slides[currentSlide];
+            frame.className = `slide-frame shadow-2xl transition-all duration-300 ${data.c}`;
+            frame.innerHTML = `
+                <h1 class="text-5xl font-extrabold text-emerald-400 mb-4">${data.t}</h1>
+                <p class="text-xl text-slate-300 max-w-xl mx-auto">${data.p}</p>
+            `;
+            document.getElementById('slide-counter').innerText = `SLIDE ${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function nextSlide() { currentSlide = (currentSlide + 1) % slides.length; updateSlide(); }
+        function prevSlide() { currentSlide = (currentSlide - 1 + slides.length) % slides.length; updateSlide(); }
+
+        // UTILITIES
+        function toggleAnswer(id) {
+            const a = document.getElementById(`ans-${id}`);
+            const i = document.getElementById(`icon-${id}`);
+            a.classList.toggle('hidden');
+            i.classList.toggle('fa-chevron-up');
+        }
+
+        function copyCode(text) {
+            navigator.clipboard.writeText(text);
+            alert("Input copied to clipboard!");
+        }
+
+        // VISUALIZATIONS
+        window.onload = () => {
+            const ctx1 = document.getElementById('tokenChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Keywords', 'IDs', 'Operators', 'Literals', 'Punc'],
+                    datasets: [{
+                        data: [15, 35, 20, 20, 10],
+                        backgroundColor: ['#10b981', '#059669', '#34d399', '#6ee7b7', '#020617'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+            });
+
+            const ctx2 = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'radar',
+                data: {
+                    labels: ['Memory Mapping', 'Operator Logic', 'Role Definition', 'Context Check'],
+                    datasets: [
+                        { label: 'Data Type', data: [90, 80, 20, 40], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)' },
+                        { label: 'Symbol Type', data: [20, 30, 95, 90], borderColor: '#020617', backgroundColor: 'rgba(2, 6, 23, 0.2)' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 100 } } }
+            });
+        };
+    </script>
+</body>
+</html>

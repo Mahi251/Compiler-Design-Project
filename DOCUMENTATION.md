@@ -169,7 +169,7 @@ Public API:
 
 | Method                              | Purpose                                                                 |
 |-------------------------------------|-------------------------------------------------------------------------|
-| `declare(name, dataType, type)`     | Insert or overwrite a symbol — overwriting is a deliberate educational simplification; a production compiler would flag a redeclaration as a semantic error. |
+| `declare(name, dataType, type)`     | Insert or overwrite a symbol — overwriting is still a deliberate educational simplification inside the table itself, but the new Phase 4 semantic analyzer now flags redeclaration as a compile-time error before success is reported. |
 | `lookup(name)`                      | Return the matching `Symbol` or `null` if not present.                  |
 | `getAll()`                          | Return an unordered `Collection<Symbol>` (HashMap iteration order).     |
 | `getAllSorted()`                    | Return a `List<Symbol>` sorted alphabetically by name — the GUI uses this to give the user a stable, predictable display. |
@@ -261,10 +261,28 @@ The public API consists of `addChild` (which returns the child for call chaining
 
 1. **UI reset** (per `update.txt`): clear the console, clear both table models to zero rows, and replace the `JTree` model with a single `"No Tree Generated"` root. This guarantees that no stale data from a prior compilation is visible.
 2. **Lexical analysis**: instantiate `Lexer(source)`, call `tokenize()`, and append every token (except the trailing `EOF`) as a row in the Tokens table.
-3. **Syntax / symbol / tree analysis**: instantiate `Parser(tokens)`, call `parseProgram()`. On success, build a fresh `DefaultTreeModel` from `root.toTreeNode()` and assign it to the `JTree`; iterate `parser.getSymbolTable().getAllSorted()` to populate the Symbol Table view.
-4. **Reporting**: append two status lines to the console ("Syntax analysis complete: N symbols stored.", "Build Successful.").
+3. **Syntax + semantic analysis**: instantiate `Parser(tokens)`, call `parseProgram()`, then immediately pass the resulting parse tree and symbol table into `SemanticAnalyzer.analyze(root, parser.getSymbolTable())`. On success, build a fresh `DefaultTreeModel` from `root.toTreeNode()` and assign it to the `JTree`; iterate `parser.getSymbolTable().getAllSorted()` to populate the Symbol Table view.
+4. **Reporting**: append two status lines to the console ("Semantic analysis complete: N symbols stored.", "Build Successful.").
 
 All `LexerException` and `SyntaxException` throws are caught at the top level. On any failure, the console receives a prefixed message (`LEXICAL ERROR:` or `SYNTAX ERROR:`), the parse-tree panel is reset to the neutral state via `resetParseTreeToEmpty()`, and the GUI remains interactive so the user can correct the input and re-run.
+
+### 3.9 `SemanticAnalyzer.java` — Phase 4 Semantic Checks
+
+**Role:** Walks the parse tree after parsing and enforces the language's semantic rules. It is deliberately separate from the Parser so syntax recognition stays focused on grammar, while this class focuses on meaning and type safety.
+
+**Error model:** The analyzer throws a single unchecked `SemanticAnalyzer.SemanticException` as soon as the first violation is found. The GUI catches that exception, prefixes the message with `SEMANTIC ERROR:`, and resets the parse-tree display.
+
+**Rules enforced:**
+
+* identifiers must be declared before use
+* redeclarations are rejected in the flat scope
+* `void` is not allowed for variables or parameters
+* assignment compatibility allows `int -> float` but rejects `float -> int`
+* function calls must match declared argument count and types
+* numeric operators (`+`, `-`, `*`, `/`, comparisons, and logical operators) require numeric operands
+* return statements must match the current function's return type
+
+**Implementation note:** Because the parser's expression tree is left-associative, the analyzer reads each expression node as a base operand followed by zero or more `Operator: ...` children. That keeps the checker aligned with the existing parse-tree structure without changing the parser itself.
 
 **Application entry point:** `public static void main(String[] args)` schedules GUI creation on the Event-Dispatch Thread via `SwingUtilities.invokeLater`, complying with Swing's single-thread rule.
 

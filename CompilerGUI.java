@@ -233,7 +233,7 @@ public class CompilerGUI extends JFrame {
             consoleArea.append("Lexical analysis complete: " + tokens.size()
                     + " tokens generated.\n");
 
-            // ---- Phase 2 & 3 & 4: Syntax + Symbol Table + Parse Tree ----
+            // ---- Phase 2: Syntax Analysis ----
             Parser parser = new Parser(tokens);
             ParseTreeNode root = parser.parseProgram();
 
@@ -244,6 +244,12 @@ public class CompilerGUI extends JFrame {
             }
             parseTreeModel = new DefaultTreeModel(newRoot);
             parseTree.setModel(parseTreeModel);
+
+            // ---- Phase 4: Semantic Analysis ----
+            // This runs immediately after a successful parse so semantic
+            // errors stop the pipeline before the GUI reports success.
+            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+            semanticAnalyzer.analyze(root, parser.getSymbolTable());
 
             // Refresh the Symbol Table JTable.
             for (Symbol s : parser.getSymbolTable().getAllSorted()) {
@@ -265,6 +271,10 @@ public class CompilerGUI extends JFrame {
         } catch (Parser.SyntaxException se) {
             // Syntax error -- the message already contains the line number.
             consoleArea.append("SYNTAX ERROR: " + se.getMessage() + "\n");
+            resetParseTreeToEmpty();
+        } catch (SemanticAnalyzer.SemanticException sme) {
+            // Semantic error -- halt immediately on the first violation.
+            consoleArea.append(sme.getMessage() + "\n");
             resetParseTreeToEmpty();
         } catch (Exception ex) {
             // Anything else -- log the stack trace for the developer.
